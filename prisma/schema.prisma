@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  name                String?
+  email               String    @unique
+  emailVerified       DateTime?
+  passwordHash        String?
+  image               String?
+  monthlyIncomeCents  Int       @default(550000)
+  hourlyNetPayCents   Int       @default(3200)
+  onboardingCompleted Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  budgetMonths       BudgetMonth[]
+  envelopes          BudgetEnvelope[]
+  savingsGoals       SavingsGoal[]
+  savingsDeposits    SavingsContribution[]
+  plaidItems         PlaidItem[]
+  creditCardAccounts CreditCardAccount[]
+  transactions       Transaction[]
+  pushSubscriptions  PushSubscription[]
+  notifications      NotificationEvent[]
+  academyProgress    AcademyProgress[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model BudgetMonth {
+  id               String   @id @default(cuid())
+  userId           String
+  monthKey         String
+  incomeCents      Int
+  cardReserveCents Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, monthKey])
+}
+
+model BudgetEnvelope {
+  id             String   @id @default(cuid())
+  userId         String
+  monthKey       String
+  name           String
+  categoryKey    String
+  allocatedCents Int
+  spentCents     Int      @default(0)
+  isEssential    Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  colorToken     String   @default("emerald")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId, monthKey])
+}
+
+model SavingsGoal {
+  id                 String   @id @default(cuid())
+  userId             String
+  name               String
+  targetCents        Int
+  currentCents       Int      @default(0)
+  monthlyTargetCents Int      @default(0)
+  apyBps             Int      @default(450)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contributions SavingsContribution[]
+
+  @@index([userId])
+}
+
+model SavingsContribution {
+  id          String   @id @default(cuid())
+  userId      String
+  goalId      String
+  amountCents Int
+  source      String   @default("MANUAL")
+  note        String?
+  createdAt   DateTime @default(now())
+
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal SavingsGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([userId, goalId])
+}
+
+model PlaidItem {
+  id              String    @id @default(cuid())
+  userId          String
+  itemId          String    @unique
+  accessToken     String
+  institutionId   String?
+  institutionName String
+  cursor          String?
+  status          String    @default("ACTIVE")
+  lastSyncedAt    DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts CreditCardAccount[]
+
+  @@index([userId])
+}
+
+model CreditCardAccount {
+  id                  String   @id @default(cuid())
+  userId              String
+  plaidItemId         String
+  accountId           String   @unique
+  name                String
+  officialName        String?
+  mask                String?
+  currentBalanceCents Int      @default(0)
+  creditLimitCents    Int?
+  aprBps              Int      @default(2199)
+  isSimulated         Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plaidItem    PlaidItem     @relation(fields: [plaidItemId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id                     String   @id @default(cuid())
+  userId                 String
+  creditCardAccountId    String
+  envelopeId             String?
+  plaidTransactionId     String?  @unique
+  merchantName           String
+  amountCents            Int
+  currency               String   @default("USD")
+  date                   DateTime
+  pending                Boolean  @default(false)
+  plaidPrimaryCategory  String?
+  plaidDetailedCategory String?
+  paymentChannel         String   @default("in store")
+  mindfulReflection      String?
+  coachingNote           String?
+  budgetStatusAtPurchase String   @default("WITHIN_BUDGET")
+  isSimulated            Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditCardAccount CreditCardAccount   @relation(fields: [creditCardAccountId], references: [id], onDelete: Cascade)
+  envelope          BudgetEnvelope?     @relation(fields: [envelopeId], references: [id], onDelete: SetNull)
+  notifications     NotificationEvent[]
+
+  @@index([userId, date])
+  @@index([envelopeId])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model NotificationEvent {
+  id               String    @id @default(cuid())
+  userId           String
+  transactionId    String?
+  title            String
+  body             String
+  severity         String    @default("WITHIN_BUDGET")
+  deliveredViaPush Boolean   @default(false)
+  readAt           DateTime?
+  createdAt        DateTime  @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model AcademyProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  moduleSlug     String
+  reflectionNote String?
+  completedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleSlug])
+}
