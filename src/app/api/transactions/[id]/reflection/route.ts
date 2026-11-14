@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recalculateMonthTotals } from "@/lib/budget-engine";
 import { getCurrentMonthKey } from "@/lib/format";
+import { HOARD_CATALOG } from "@/lib/hoard-engine";
 
 export async function POST(
   req: Request,
@@ -27,6 +28,9 @@ export async function POST(
   const updateData: {
     mindfulReflection?: string | null;
     envelopeId?: string | null;
+    hoardItemType?: string | null;
+    hoardItemLabel?: string | null;
+    hoardQuantity?: number | null;
   } = {};
 
   if ("mindfulReflection" in body) {
@@ -45,6 +49,21 @@ export async function POST(
       return NextResponse.json({ error: "Target envelope not found." }, { status: 404 });
     }
     updateData.envelopeId = targetEnvelope.id;
+  }
+
+  if ("hoardItemType" in body && body.hoardItemType) {
+    const itemType = String(body.hoardItemType);
+    if (!(itemType in HOARD_CATALOG)) {
+      return NextResponse.json({ error: "Invalid hoard item type." }, { status: 400 });
+    }
+    updateData.hoardItemType = itemType;
+    updateData.hoardItemLabel = body.hoardItemLabel
+      ? String(body.hoardItemLabel).trim()
+      : HOARD_CATALOG[itemType as keyof typeof HOARD_CATALOG].label;
+  }
+
+  if ("hoardQuantity" in body && body.hoardQuantity != null) {
+    updateData.hoardQuantity = Math.max(1, Math.round(Number(body.hoardQuantity)));
   }
 
   const updated = await prisma.transaction.update({

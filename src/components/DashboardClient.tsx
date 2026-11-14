@@ -19,6 +19,8 @@ import {
   formatCents,
   getMonthLabel,
 } from "@/lib/format";
+import { HOARD_CATALOG, type HoardItemType } from "@/lib/hoard-engine";
+import { HoardVisual } from "@/components/HoardVisual";
 
 interface Envelope {
   id: string;
@@ -46,6 +48,11 @@ interface TransactionItem {
   date: string;
   pending: boolean;
   paymentChannel: string;
+  plaidPrimaryCategory: string | null;
+  plaidDetailedCategory: string | null;
+  hoardItemType: string | null;
+  hoardItemLabel: string | null;
+  hoardQuantity: number | null;
   mindfulReflection: string | null;
   coachingNote: string | null;
   budgetStatusAtPurchase: string;
@@ -62,6 +69,8 @@ interface DashboardPayload {
     monthlyIncomeCents: number;
     hourlyNetPayCents: number;
     onboardingCompleted: boolean;
+    avatarStyle?: string;
+    avatarColor?: string;
   };
   monthKey: string;
   budgetMonth: {
@@ -99,6 +108,8 @@ export function DashboardClient() {
   const [simAmountDollars, setSimAmountDollars] = useState("14.50");
   const [simChannel, setSimChannel] = useState("in store");
   const [simEnvelopeId, setSimEnvelopeId] = useState("");
+  const [simHoardType, setSimHoardType] = useState<string>("");
+  const [simHoardQty, setSimHoardQty] = useState<string>("");
   const [simBusy, setSimBusy] = useState(false);
   const [liveAlertBanner, setLiveAlertBanner] = useState<{
     status: string;
@@ -195,7 +206,9 @@ export function DashboardClient() {
   async function handleSimulateSwipe(
     overrideMerchant?: string,
     overrideDollars?: string,
-    overrideChannel?: string
+    overrideChannel?: string,
+    overrideHoardType?: string,
+    overrideHoardQty?: number
   ) {
     setSimBusy(true);
     try {
@@ -203,6 +216,10 @@ export function DashboardClient() {
       const amountCents = Math.round(
         parseFloat(overrideDollars || simAmountDollars || "14.50") * 100
       );
+      const chosenType = overrideHoardType ?? (simHoardType || null);
+      const chosenQty =
+        overrideHoardQty ??
+        (simHoardQty ? Math.max(1, parseInt(simHoardQty, 10)) : null);
       const res = await fetch("/api/simulate-purchase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -211,6 +228,8 @@ export function DashboardClient() {
           amountCents,
           paymentChannel: overrideChannel || simChannel,
           envelopeId: simEnvelopeId || null,
+          hoardItemType: chosenType || null,
+          hoardQuantity: chosenQty,
         }),
       });
       const json = await res.json();
@@ -238,6 +257,15 @@ export function DashboardClient() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ envelopeId }),
+    });
+    await loadDashboard();
+  }
+
+  async function handleQuickHoardTag(txId: string, hoardItemType: string) {
+    await fetch(`/api/transactions/${txId}/reflection`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hoardItemType }),
     });
     await loadDashboard();
   }
@@ -555,6 +583,18 @@ export function DashboardClient() {
         </div>
       )}
 
+      {/* Visual Purchase Hoard Showcase */}
+      <HoardVisual
+        userName={data.user.name}
+        avatarStyle={data.user.avatarStyle || "explorer"}
+        avatarColor={data.user.avatarColor || "#1B4D3E"}
+        hourlyNetPayCents={data.user.hourlyNetPayCents}
+        monthKey={data.monthKey}
+        totalSavedCents={totalSavedCents}
+        transactions={data.transactions}
+        onRefresh={loadDashboard}
+      />
+
       {/* Top 4 Metrics */}
       <section className="metrics-grid">
         <div className="metric-card">
@@ -739,6 +779,14 @@ export function DashboardClient() {
                             {tx.creditCardAccount.mask ? `••${tx.creditCardAccount.mask}` : ""} ·{" "}
                             {tx.paymentChannel === "online" ? "Online Checkout" : "In-Store / Tap"} ·{" "}
                             {calcWorkHours(tx.amountCents, data.user.hourlyNetPayCents)}
+                            {tx.hoardItemLabel ? (
+                              <>
+                                {" "}·{" "}
+                                <strong style={{ color: "var(--emerald)" }}>
+                                  {tx.hoardQuantity || 1}× {tx.hoardItemLabel}
+                                </strong>
+                              </>
+                            ) : null}
                           </div>
                         </div>
 
@@ -783,19 +831,35 @@ export function DashboardClient() {
                           })}
                         </div>
 
-                        <select
-                          aria-label={`Envelope for ${tx.merchantName}`}
-                          className="field-select"
-                          style={{ width: "auto", padding: "4px 10px", fontSize: "0.8rem" }}
-                          value={tx.envelope?.id || ""}
-                          onChange={(e) => handleReassignEnvelope(tx.id, e.target.value)}
-                        >
-                          {data.envelopes.map((env) => (
-                            <option key={env.id} value={env.id}>
-                              {env.name}
-                            </option>
-                          ))}
-                        </select>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          <select
+                            aria-label={`Hoard item visual for ${tx.merchantName}`}
+                            className="field-select"
+                            style={{ width: "auto", padding: "4px 10px", fontSize: "0.78rem" }}
+                            value={tx.hoardItemType || "general"}
+                            onChange={(e) => handleQuickHoardTag(tx.id, e.target.value)}
+                          >
+                            {(Object.keys(HOARD_CATALOG) as HoardItemType[]).map((key) => (
+                              <option key={key} value={key}>
+                                Hoard: {HOARD_CATALOG[key].label}
+                              </option>
+                            ))}
+                          </select>
+
+                          <select
+                            aria-label={`Envelope for ${tx.merchantName}`}
+                            className="field-select"
+                            style={{ width: "auto", padding: "4px 10px", fontSize: "0.78rem" }}
+                            value={tx.envelope?.id || ""}
+                            onChange={(e) => handleReassignEnvelope(tx.id, e.target.value)}
+                          >
+                            {data.envelopes.map((env) => (
+                              <option key={env.id} value={env.id}>
+                                {env.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
                   );
@@ -813,7 +877,7 @@ export function DashboardClient() {
               <h2 style={{ fontSize: "1.22rem" }}>Simulate Live Card Swipe</h2>
             </div>
             <p style={{ fontSize: "0.86rem", color: "var(--ink-secondary)", marginTop: 5 }}>
-              Test the exact Plaid webhook &rarr; Envelope deduction &rarr; Card Reserve &rarr; Push Notification pipeline instantly.
+              Add items straight into your Hoard + test the Plaid &rarr; Envelope &rarr; Card Reserve &rarr; Push pipeline.
             </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
@@ -821,7 +885,39 @@ export function DashboardClient() {
                 type="button"
                 className="btn btn-secondary btn-sm"
                 disabled={simBusy}
-                onClick={() => handleSimulateSwipe("Blue Bottle Coffee", "7.50", "in store")}
+                onClick={() =>
+                  handleSimulateSwipe("Costco Food Court", "15.00", "in store", "costco_hotdog", 10)
+                }
+              >
+                +10 Costco Hot Dogs ($15)
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={simBusy}
+                onClick={() =>
+                  handleSimulateSwipe("Nintendo Store (Switch 2)", "449.99", "online", "switch_2", 1)
+                }
+              >
+                +Switch 2 ($449.99)
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={simBusy}
+                onClick={() =>
+                  handleSimulateSwipe("Steam Store", "59.99", "online", "steam_game", 1)
+                }
+              >
+                +Steam Game ($59.99)
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={simBusy}
+                onClick={() =>
+                  handleSimulateSwipe("Blue Bottle Coffee", "7.50", "in store", "coffee", 1)
+                }
               >
                 $7.50 Coffee
               </button>
@@ -829,17 +925,11 @@ export function DashboardClient() {
                 type="button"
                 className="btn btn-secondary btn-sm"
                 disabled={simBusy}
-                onClick={() => handleSimulateSwipe("Trader Joe's", "64.20", "in store")}
+                onClick={() =>
+                  handleSimulateSwipe("Nordstrom Online", "145.00", "online", "clothing", 2)
+                }
               >
-                $64.20 Groceries
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                disabled={simBusy}
-                onClick={() => handleSimulateSwipe("Nordstrom Online", "145.00", "online")}
-              >
-                $145.00 Shopping (Impulse Test)
+                $145.00 Impulse Test
               </button>
             </div>
 
@@ -884,6 +974,36 @@ export function DashboardClient() {
                     <option value="in store">Tap / In-Store</option>
                     <option value="online">Online 1-Click</option>
                   </select>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1.35fr 0.65fr", gap: 10 }}>
+                <div className="field-group">
+                  <label className="field-label">Hoard Visual Item</label>
+                  <select
+                    className="field-select"
+                    value={simHoardType}
+                    onChange={(e) => setSimHoardType(e.target.value)}
+                  >
+                    <option value="">Auto-detect from merchant</option>
+                    {(Object.keys(HOARD_CATALOG) as HoardItemType[]).map((key) => (
+                      <option key={key} value={key}>
+                        {HOARD_CATALOG[key].label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field-group">
+                  <label className="field-label">Item Qty</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="500"
+                    placeholder="Auto"
+                    className="field-input"
+                    value={simHoardQty}
+                    onChange={(e) => setSimHoardQty(e.target.value)}
+                  />
                 </div>
               </div>
 

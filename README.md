@@ -19,6 +19,7 @@ Tallywise is designed around peer-reviewed research on why credit cards and cont
 - **Auth:** Auth.js v5 (Credentials + optional Google OAuth)
 - **Credit Card Sync:** Plaid Link + `/transactions/sync` + `/api/plaid/webhook` (`SYNC_UPDATES_AVAILABLE` with ES256 JWT verification) + built-in Live Purchase Simulator
 - **Push Notifications:** Native Web Push API (Service Worker `public/sw.js` + VAPID via `web-push`) + PWA Manifest
+- **Purchase Hoard Visualizer:** Customizable user avatar standing above a visual pile of every real item bought (e.g., 150 Costco hot dogs, Nintendo Switch 2, Steam game cover artwork) beside a Savings Treasure Vault, with Full Year (YTD) / Monthly toggles and click-to-retag item inspector
 
 ## Local Development
 

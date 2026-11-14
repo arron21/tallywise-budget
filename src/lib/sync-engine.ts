@@ -110,6 +110,9 @@ export async function processSimulatedSwipe(params: {
   categoryPrimary?: string;
   paymentChannel?: string;
   envelopeId?: string | null;
+  hoardItemType?: string | null;
+  hoardItemLabel?: string | null;
+  hoardQuantity?: number | null;
 }) {
   let card = await prisma.creditCardAccount.findFirst({
     where: { userId: params.userId },
@@ -153,6 +156,9 @@ export async function processSimulatedSwipe(params: {
     paymentChannel: params.paymentChannel || "in store",
     isSimulated: true,
     explicitEnvelopeId: params.envelopeId ?? null,
+    hoardItemType: params.hoardItemType ?? null,
+    hoardItemLabel: params.hoardItemLabel ?? null,
+    hoardQuantity: params.hoardQuantity ?? null,
     notify: true,
   });
 }

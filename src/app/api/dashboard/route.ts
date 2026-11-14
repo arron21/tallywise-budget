@@ -38,6 +38,8 @@ export async function GET() {
         monthlyIncomeCents: true,
         hourlyNetPayCents: true,
         onboardingCompleted: true,
+        avatarStyle: true,
+        avatarColor: true,
       },
     }),
     prisma.budgetMonth.findUnique({
@@ -81,7 +83,7 @@ export async function GET() {
         },
       },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-      take: 40,
+      take: 250,
     }),
     prisma.notificationEvent.findMany({
       where: { userId },

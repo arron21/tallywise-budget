@@ -17,6 +17,8 @@ model User {
   monthlyIncomeCents  Int       @default(550000)
   hourlyNetPayCents   Int       @default(3200)
   onboardingCompleted Boolean   @default(false)
+  avatarStyle         String    @default("explorer")
+  avatarColor         String    @default("#1B4D3E")
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
@@ -196,6 +198,9 @@ model Transaction {
   mindfulReflection      String?
   coachingNote           String?
   budgetStatusAtPurchase String   @default("WITHIN_BUDGET")
+  hoardItemType          String?
+  hoardItemLabel         String?
+  hoardQuantity          Int?
   isSimulated            Boolean  @default(false)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt

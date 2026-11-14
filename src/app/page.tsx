@@ -1,7 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/auth";
-import { ArrowRight, BellRing, PiggyBank, ShieldCheck } from "lucide-react";
+import { ArrowRight, BellRing, PiggyBank, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  CharacterAvatarSvg,
+  HotDogSpriteSvg,
+  SavingsChestSvg,
+  Switch2ConsoleSvg,
+} from "@/components/HoardVisual";
 
 export default async function HomePage() {
   const session = await auth();
@@ -12,22 +18,24 @@ export default async function HomePage() {
         <div className="hero-grid">
           <div>
             <div className="hero-eyebrow">
-              Behavioral Economics × Real-Time Credit Control
+              Behavioral Economics × Visual Spend Hoard
             </div>
             <h1 className="hero-title">
-              Make every credit card tap feel as real as cash.
+              See every dollar turn into what you actually bought.
             </h1>
             <p className="hero-subtitle">
-              Behavioral studies show people spend 12%–18% more with credit cards
-              because deferred billing silences the natural &ldquo;pain of
-              paying.&rdquo; Tallywise syncs with your cards via Plaid, locks
-              your budget in zero-based envelopes, and pushes instant spending
-              alerts on every purchase.
+              Credit cards numb the natural &ldquo;pain of paying,&rdquo; leading
+              people to spend 12%–18% more without noticing. Tallywise syncs
+              with your cards via Plaid, locks your cash in zero-based envelopes,
+              pushes instant swipe alerts, and piles your real purchases—from{" "}
+              <strong>150 Costco hot dogs</strong> to a{" "}
+              <strong>Nintendo Switch 2</strong> and{" "}
+              <strong>$400 in Steam games</strong>—right beneath your avatar.
             </p>
             <div className="hero-cta-row">
               {session?.user ? (
                 <Link href="/dashboard" className="btn btn-primary">
-                  Open Your Budget <ArrowRight size={17} />
+                  Open Your Purchase Hoard <ArrowRight size={17} />
                 </Link>
               ) : (
                 <>
@@ -35,7 +43,7 @@ export default async function HomePage() {
                     Build Your Real Budget <ArrowRight size={17} />
                   </Link>
                   <Link href="/login?demo=1" className="btn btn-secondary">
-                    Try Live Demo Account
+                    Try Live Demo Hoard
                   </Link>
                 </>
               )}
@@ -49,15 +57,106 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="hero-visual-frame">
-            <Image
-              src="/images/mindful-envelope-hero.jpg"
-              alt="Tactile paper budget envelopes, savings vessel, and credit card"
-              width={1024}
-              height={768}
-              priority
-              className="hero-visual-img"
-            />
+          {/* Interactive-style Visual Hoard Showcase */}
+          <div className="hero-hoard-preview">
+            <div className="hero-hoard-banner">
+              <span>
+                <Sparkles size={14} /> Sample Year-in-Review Hoard
+              </span>
+              <span className="mono-num">$1,074.99 visualized</span>
+            </div>
+
+            <div className="hero-hoard-top">
+              <div className="hero-hoard-avatar">
+                <CharacterAvatarSvg style="explorer" color="#1B4D3E" size={88} />
+                <span className="mono-num" style={{ fontSize: "0.78rem", fontWeight: 700 }}>
+                  Maya’s Hoard
+                </span>
+              </div>
+              <div className="hero-hoard-chest">
+                <SavingsChestSvg size={70} />
+                <div>
+                  <div style={{ fontSize: "0.74rem", fontWeight: 700, color: "var(--emerald)" }}>
+                    KEPT SAVINGS
+                  </div>
+                  <div className="mono-num" style={{ fontSize: "1.1rem", fontWeight: 700 }}>
+                    $13,700.00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="hero-hoard-loot">
+              <div className="hero-loot-card">
+                <div className="hero-loot-head">
+                  <span className="mono-num">150× Costco Hot Dogs</span>
+                  <span className="mono-num">$225.00</span>
+                </div>
+                <div className="hero-hotdog-grid" aria-label="40 sample hot dog icons representing 150 total">
+                  {Array.from({ length: 36 }).map((_, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        display: "inline-flex",
+                        transform: `rotate(${((idx * 17) % 19) - 9}deg)`,
+                      }}
+                    >
+                      <HotDogSpriteSvg size={20} />
+                    </span>
+                  ))}
+                  <span className="hoard-overflow-badge mono-num">150 total</span>
+                </div>
+              </div>
+
+              <div className="hero-loot-split">
+                <div className="hero-loot-card" style={{ textAlign: "center" }}>
+                  <div className="hero-loot-head">
+                    <span className="mono-num">1× Switch 2</span>
+                    <span className="mono-num">$449.99</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "center", padding: "6px 0" }}>
+                    <Switch2ConsoleSvg width={120} />
+                  </div>
+                </div>
+
+                <div className="hero-loot-card">
+                  <div className="hero-loot-head">
+                    <span className="mono-num">8× Steam Games</span>
+                    <span className="mono-num">$400.00</span>
+                  </div>
+                  <div className="hero-steam-mini">
+                    <Image
+                      src="/images/hoard/steam-scifi.jpg"
+                      alt="Steam sci-fi game artwork"
+                      width={64}
+                      height={80}
+                      className="hero-steam-img"
+                    />
+                    <Image
+                      src="/images/hoard/steam-fantasy.jpg"
+                      alt="Steam fantasy game artwork"
+                      width={64}
+                      height={80}
+                      className="hero-steam-img"
+                    />
+                    <Image
+                      src="/images/hoard/steam-racing.jpg"
+                      alt="Steam racing game artwork"
+                      width={64}
+                      height={80}
+                      className="hero-steam-img"
+                    />
+                    <Image
+                      src="/images/hoard/steam-cozy.jpg"
+                      alt="Steam cozy game artwork"
+                      width={64}
+                      height={80}
+                      className="hero-steam-img"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -79,14 +178,14 @@ export default async function HomePage() {
 
         <div className="surface-card">
           <div className="mono-num" style={{ fontSize: "1.9rem", fontWeight: 700, color: "var(--terracotta)" }}>
-            +8% to +10%
+            150× Visualized
           </div>
           <h3 style={{ fontSize: "1.1rem", marginTop: 8 }}>
-            Contactless &ldquo;Spendception&rdquo;
+            Make Micro-Spends Tangible
           </h3>
           <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-            Trütsch (2014) and DNB studies show contactless &amp; mobile taps
-            further numb payment awareness across ~16 monthly card swipes.
+            When \$1.50 taps or \$59 game downloads turn into literal stacked hot
+            dogs and game cases under your avatar, spending clicks instantly.
           </p>
         </div>
 
@@ -129,8 +228,8 @@ export default async function HomePage() {
                 2. Zero-Based Envelopes
               </h3>
               <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-                Give every take-home dollar a job. When Groceries or Dining runs
-                low, rebalance intentionally rather than creating debt.
+                Give every take-home dollar a job. Watch your Purchase Hoard
+                grow only inside planned caps instead of accidental debt.
               </p>
             </div>
             <div>
@@ -140,7 +239,7 @@ export default async function HomePage() {
               </h3>
               <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
                 Every Plaid webhook or simulated swipe triggers a Web Push alert
-                with envelope status, work-hours cost, and 10-year value.
+                with envelope status, work-hours cost, and adds items to your Hoard.
               </p>
             </div>
           </div>

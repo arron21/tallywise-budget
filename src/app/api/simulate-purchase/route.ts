@@ -20,6 +20,10 @@ export async function POST(req: Request) {
       : undefined;
     const paymentChannel = String(body?.paymentChannel || "in store");
     const envelopeId = body?.envelopeId ? String(body.envelopeId) : null;
+    const hoardItemType = body?.hoardItemType ? String(body.hoardItemType) : null;
+    const hoardItemLabel = body?.hoardItemLabel ? String(body.hoardItemLabel) : null;
+    const hoardQuantity =
+      body?.hoardQuantity != null ? Math.max(1, Math.round(Number(body.hoardQuantity))) : null;
 
     const result = await processSimulatedSwipe({
       userId: session.user.id,
@@ -28,6 +32,9 @@ export async function POST(req: Request) {
       categoryPrimary,
       paymentChannel,
       envelopeId,
+      hoardItemType,
+      hoardItemLabel,
+      hoardQuantity,
     });
 
     return NextResponse.json({

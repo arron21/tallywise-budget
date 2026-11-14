@@ -2,6 +2,7 @@ import { prisma } from "./prisma";
 import { getCurrentMonthKey } from "./format";
 import { buildPurchaseCoaching } from "./research";
 import { dispatchBudgetNotification } from "./push";
+import { inferHoardItem } from "./hoard-engine";
 
 export const STARTER_ENVELOPES = [
   {
@@ -47,7 +48,7 @@ export const STARTER_ENVELOPES = [
   {
     name: "Entertainment & Experiences",
     categoryKey: "ENTERTAINMENT",
-    allocatedCents: 18000,
+    allocatedCents: 28000,
     isEssential: false,
     sortOrder: 6,
     colorToken: "olive",
@@ -109,32 +110,43 @@ export function matchEnvelopeCategory<
   const primary = (plaidPrimary || "").toUpperCase();
   const merchant = (merchantName || "").toLowerCase();
 
-  // Heuristic matching for merchant names + Plaid Personal Finance Categories
   let targetKey = "GENERAL_MERCHANDISE";
 
   if (
-    detailed.includes("GROCER") ||
-    merchant.includes("trader joe") ||
-    merchant.includes("whole foods") ||
-    merchant.includes("kroger") ||
-    merchant.includes("aldi") ||
-    merchant.includes("safeway") ||
-    merchant.includes("costco")
-  ) {
-    targetKey = "FOOD_AND_DRINK_GROCERIES";
-  } else if (
+    merchant.includes("hot dog") ||
+    merchant.includes("hotdog") ||
+    merchant.includes("food court") ||
     primary === "FOOD_AND_DRINK" ||
     detailed.includes("COFFEE") ||
     detailed.includes("RESTAURANT") ||
     merchant.includes("coffee") ||
     merchant.includes("starbucks") ||
     merchant.includes("blue bottle") ||
+    merchant.includes("philz") ||
     merchant.includes("sweetgreen") ||
     merchant.includes("chipotle") ||
     merchant.includes("doordash") ||
     merchant.includes("uber eats")
   ) {
-    targetKey = "FOOD_AND_DRINK_RESTAURANTS";
+    if (
+      detailed.includes("GROCER") ||
+      merchant.includes("trader joe") ||
+      merchant.includes("whole foods") ||
+      merchant.includes("kroger") ||
+      merchant.includes("aldi") ||
+      merchant.includes("safeway")
+    ) {
+      targetKey = "FOOD_AND_DRINK_GROCERIES";
+    } else {
+      targetKey = "FOOD_AND_DRINK_RESTAURANTS";
+    }
+  } else if (
+    detailed.includes("GROCER") ||
+    merchant.includes("trader joe") ||
+    merchant.includes("whole foods") ||
+    merchant.includes("costco")
+  ) {
+    targetKey = "FOOD_AND_DRINK_GROCERIES";
   } else if (
     primary === "TRANSPORTATION" ||
     primary === "TRAVEL" ||
@@ -157,6 +169,9 @@ export function matchEnvelopeCategory<
     targetKey = "RENT_AND_UTILITIES";
   } else if (
     primary === "ENTERTAINMENT" ||
+    merchant.includes("steam") ||
+    merchant.includes("nintendo") ||
+    merchant.includes("switch") ||
     merchant.includes("cinema") ||
     merchant.includes("amc") ||
     merchant.includes("ticketmaster") ||
@@ -237,6 +252,9 @@ export async function applyPurchaseAndNotify(params: {
   paymentChannel?: string;
   isSimulated?: boolean;
   explicitEnvelopeId?: string | null;
+  hoardItemType?: string | null;
+  hoardItemLabel?: string | null;
+  hoardQuantity?: number | null;
   notify?: boolean;
 }) {
   const monthKey = getCurrentMonthKey(params.date);
@@ -294,6 +312,18 @@ export async function applyPurchaseAndNotify(params: {
     });
   }
 
+  const hoardInfo = isPurchase
+    ? inferHoardItem({
+        merchantName: params.merchantName,
+        amountCents: params.amountCents,
+        plaidPrimaryCategory: params.plaidPrimaryCategory,
+        plaidDetailedCategory: params.plaidDetailedCategory,
+        explicitType: params.hoardItemType,
+        explicitLabel: params.hoardItemLabel,
+        explicitQuantity: params.hoardQuantity,
+      })
+    : { hoardItemType: null, hoardItemLabel: null, hoardQuantity: null };
+
   const tx = await prisma.transaction.create({
     data: {
       userId: params.userId,
@@ -309,6 +339,9 @@ export async function applyPurchaseAndNotify(params: {
       paymentChannel: params.paymentChannel || "in store",
       coachingNote: coaching.coachingNote,
       budgetStatusAtPurchase: coaching.status,
+      hoardItemType: hoardInfo.hoardItemType,
+      hoardItemLabel: hoardInfo.hoardItemLabel,
+      hoardQuantity: hoardInfo.hoardQuantity,
       isSimulated: Boolean(params.isSimulated),
     },
   });
