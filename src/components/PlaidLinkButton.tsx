@@ -106,7 +106,7 @@ export function PlaidLinkButton({
           <h3 style={{ fontSize: "1.2rem" }}>Plaid Credit Card Sync</h3>
           <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 4 }}>
             Link real credit cards via Plaid Link. Tallywise listens for{" "}
-            <code>SYNC_UPDATES_AVAILABLE</code> webhooks and deducts envelopes automatically.
+            <code>SYNC_UPDATES_AVAILABLE</code> webhooks and drops new purchases straight into your Hoard.
           </p>
         </div>
         <span className={`status-pill ${plaidConfigured ? "status-within" : "status-near"}`}>
@@ -116,7 +116,7 @@ export function PlaidLinkButton({
 
       {!plaidConfigured && (
         <div className="banner-warn" style={{ marginTop: 14 }}>
-          Add <code>PLAID_CLIENT_ID</code> and <code>PLAID_SECRET</code> to your Vercel environment variables to launch Plaid Link for live or sandbox institutions. Meanwhile, you can use the <strong>Live Card Swipe Simulator</strong> on the Budget page to test real-time alerts.
+          Add <code>PLAID_CLIENT_ID</code> and <code>PLAID_SECRET</code> to your Vercel environment variables to launch Plaid Link for live or sandbox institutions. Meanwhile, you can use the <strong>Drop Purchases Into Your Hoard</strong> panel on the My Hoard page to test instant loot drops.
         </div>
       )}
 

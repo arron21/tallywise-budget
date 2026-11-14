@@ -1,11 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/auth";
-import { ArrowRight, BellRing, PiggyBank, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BellRing, Gamepad2, Sparkles, Trophy } from "lucide-react";
 import {
   CharacterAvatarSvg,
   HotDogSpriteSvg,
-  SavingsChestSvg,
   Switch2ConsoleSvg,
 } from "@/components/HoardVisual";
 
@@ -18,42 +17,37 @@ export default async function HomePage() {
         <div className="hero-grid">
           <div>
             <div className="hero-eyebrow">
-              Behavioral Economics × Visual Spend Hoard
+              Visual Purchase Hoard × Playful Spend Loot
             </div>
             <h1 className="hero-title">
-              See every dollar turn into what you actually bought.
+              Watch every dollar turn into a pile of stuff you actually bought.
             </h1>
             <p className="hero-subtitle">
-              Credit cards numb the natural &ldquo;pain of paying,&rdquo; leading
-              people to spend 12%–18% more without noticing. Tallywise syncs
-              with your cards via Plaid, locks your cash in zero-based envelopes,
-              pushes instant swipe alerts, and piles your real purchases—from{" "}
-              <strong>150 Costco hot dogs</strong> to a{" "}
-              <strong>Nintendo Switch 2</strong> and{" "}
-              <strong>$400 in Steam games</strong>—right beneath your avatar.
+              Skip the boring spreadsheets. Tallywise turns your card swipes
+              into an interactive visual loot pile right beneath your custom
+              avatar—whether that&apos;s <strong>150 Costco hot dogs</strong>,
+              a <strong>Nintendo Switch 2</strong>, or{" "}
+              <strong>$400 worth of Steam game artwork</strong>.
             </p>
             <div className="hero-cta-row">
               {session?.user ? (
                 <Link href="/dashboard" className="btn btn-primary">
-                  Open Your Purchase Hoard <ArrowRight size={17} />
+                  Open My Purchase Hoard <ArrowRight size={17} />
                 </Link>
               ) : (
                 <>
                   <Link href="/register" className="btn btn-primary">
-                    Build Your Real Budget <ArrowRight size={17} />
+                    Start Your Purchase Hoard <ArrowRight size={17} />
                   </Link>
                   <Link href="/login?demo=1" className="btn btn-secondary">
-                    Try Live Demo Hoard
+                    Play Live Demo Hoard
                   </Link>
                 </>
               )}
-              <Link href="/academy" className="btn btn-ghost">
-                Explore the Research
-              </Link>
             </div>
             <p style={{ fontSize: "0.84rem", color: "var(--ink-muted)" }}>
-              Deploy-ready on Vercel · Plaid Transactions Sync · Native PWA Web
-              Push Alerts
+              Customizable Avatar · Collector Badges · Plaid Card Sync · Instant
+              Drop Alerts
             </p>
           </div>
 
@@ -61,9 +55,9 @@ export default async function HomePage() {
           <div className="hero-hoard-preview">
             <div className="hero-hoard-banner">
               <span>
-                <Sparkles size={14} /> Sample Year-in-Review Hoard
+                <Sparkles size={14} /> Sample Purchase Hoard
               </span>
-              <span className="mono-num">$1,074.99 visualized</span>
+              <span className="mono-num">159 items · $1,074.99</span>
             </div>
 
             <div className="hero-hoard-top">
@@ -73,15 +67,17 @@ export default async function HomePage() {
                   Maya’s Hoard
                 </span>
               </div>
-              <div className="hero-hoard-chest">
-                <SavingsChestSvg size={70} />
-                <div>
-                  <div style={{ fontSize: "0.74rem", fontWeight: 700, color: "var(--emerald)" }}>
-                    KEPT SAVINGS
-                  </div>
-                  <div className="mono-num" style={{ fontSize: "1.1rem", fontWeight: 700 }}>
-                    $13,700.00
-                  </div>
+              <div className="hero-hoard-chest" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
+                <span className="hoard-level-pill mono-num">
+                  <Trophy size={13} /> Level 10 Collector
+                </span>
+                <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--ink-primary)" }}>
+                  Unlocked Badges
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                  <span className="hoard-badge-chip unlocked">Costco Glizzy Legend</span>
+                  <span className="hoard-badge-chip unlocked">Switch 2 Owner</span>
+                  <span className="hoard-badge-chip unlocked">Steam Shelf</span>
                 </div>
               </div>
             </div>
@@ -92,7 +88,7 @@ export default async function HomePage() {
                   <span className="mono-num">150× Costco Hot Dogs</span>
                   <span className="mono-num">$225.00</span>
                 </div>
-                <div className="hero-hotdog-grid" aria-label="40 sample hot dog icons representing 150 total">
+                <div className="hero-hotdog-grid" aria-label="36 sample hot dog icons representing 150 total">
                   {Array.from({ length: 36 }).map((_, idx) => (
                     <span
                       key={idx}
@@ -161,48 +157,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="stat-strip">
-        <div className="surface-card">
-          <div className="mono-num" style={{ fontSize: "1.9rem", fontWeight: 700, color: "var(--emerald)" }}>
-            Up to 2×
-          </div>
-          <h3 style={{ fontSize: "1.1rem", marginTop: 8 }}>
-            The Credit Card Premium
-          </h3>
-          <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-            Prelec &amp; Simester (MIT, 2001) found shoppers bid up to twice as
-            much when paying by credit card instead of cash because limits feel
-            abstract.
-          </p>
-        </div>
-
-        <div className="surface-card">
-          <div className="mono-num" style={{ fontSize: "1.9rem", fontWeight: 700, color: "var(--terracotta)" }}>
-            150× Visualized
-          </div>
-          <h3 style={{ fontSize: "1.1rem", marginTop: 8 }}>
-            Make Micro-Spends Tangible
-          </h3>
-          <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-            When \$1.50 taps or \$59 game downloads turn into literal stacked hot
-            dogs and game cases under your avatar, spending clicks instantly.
-          </p>
-        </div>
-
-        <div className="surface-card">
-          <div className="mono-num" style={{ fontSize: "1.9rem", fontWeight: 700, color: "var(--sage)" }}>
-            100% Covered
-          </div>
-          <h3 style={{ fontSize: "1.1rem", marginTop: 8 }}>
-            Automatic Card Reserve
-          </h3>
-          <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-            Every synced purchase pulls cash from its budget envelope into your
-            Card Payment Reserve — ending statement shock and interest forever.
-          </p>
-        </div>
-      </section>
-
       <section style={{ paddingBottom: 72 }}>
         <div className="surface-oat">
           <div
@@ -213,33 +167,36 @@ export default async function HomePage() {
             }}
           >
             <div>
-              <PiggyBank size={22} color="#1B4D3E" />
+              <Gamepad2 size={22} color="#1B4D3E" />
               <h3 style={{ fontSize: "1.12rem", marginTop: 10 }}>
-                1. Pay Yourself First
+                1. Build Your Avatar &amp; Pile
               </h3>
               <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-                Fund your High-Yield Emergency Vault and savings goals before a
-                single discretionary dollar enters spending envelopes.
+                Customize your character persona and jacket color, then watch
+                every purchase drop into piles of hot dogs, consoles, game art,
+                and coffee cups underneath you.
               </p>
             </div>
             <div>
-              <ShieldCheck size={22} color="#1B4D3E" />
+              <Trophy size={22} color="#1B4D3E" />
               <h3 style={{ fontSize: "1.12rem", marginTop: 10 }}>
-                2. Zero-Based Envelopes
+                2. Level Up &amp; Unlock Badges
               </h3>
               <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-                Give every take-home dollar a job. Watch your Purchase Hoard
-                grow only inside planned caps instead of accidental debt.
+                Hit milestones like 100+ Costco hot dogs, Next-Gen Switch 2
+                Owner, or a $250+ Steam Shelf to level up your Collector rank
+                and inspect every item in your hoard.
               </p>
             </div>
             <div>
               <BellRing size={22} color="#1B4D3E" />
               <h3 style={{ fontSize: "1.12rem", marginTop: 10 }}>
-                3. Instant Push Coaching
+                3. Live Card Sync &amp; Drop Alerts
               </h3>
               <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 6 }}>
-                Every Plaid webhook or simulated swipe triggers a Web Push alert
-                with envelope status, work-hours cost, and adds items to your Hoard.
+                Connect credit cards with Plaid or tap 1-click loot drops to see
+                instant Web Push notifications every time new items land in your
+                hoard.
               </p>
             </div>
           </div>

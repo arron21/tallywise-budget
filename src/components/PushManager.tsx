@@ -104,7 +104,7 @@ export function PushManager({
       if (!res.ok) throw new Error(data.error || "Test failed");
       if (data.pushSentCount > 0) {
         setStatusMsg(
-          `Test push dispatched to ${data.pushSentCount} device(s) and logged to your Purchase Alerts bell.`
+          `Test push dispatched to ${data.pushSentCount} device(s) and logged to your Hoard Drop Alerts bell.`
         );
       } else {
         setStatusMsg(
@@ -123,9 +123,9 @@ export function PushManager({
     <div className="surface-card">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
         <div>
-          <h3 style={{ fontSize: "1.2rem" }}>Real-Time Purchase Push Alerts</h3>
+          <h3 style={{ fontSize: "1.2rem" }}>Real-Time Hoard Drop Alerts</h3>
           <p style={{ fontSize: "0.9rem", color: "var(--ink-secondary)", marginTop: 4 }}>
-            Restore the &ldquo;pain of paying&rdquo; in real time. Every card transaction pushes your remaining envelope balance straight to your phone or desktop.
+            Get an instant banner on your phone or desktop whenever a synced purchase drops new items into your Hoard.
           </p>
         </div>
         <span className={`status-pill ${isSubscribed ? "status-within" : "status-near"}`}>

@@ -3,13 +3,15 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import {
+  Award,
   Calendar,
-  Coins,
   Edit3,
   Layers,
   Palette,
   Sparkles,
   Tag,
+  Trash2,
+  Trophy,
   X,
 } from "lucide-react";
 import {
@@ -19,19 +21,15 @@ import {
   type HoardTransactionInput,
   buildHoardClusters,
 } from "@/lib/hoard-engine";
-import {
-  calcTenYearOpportunityCents,
-  calcWorkHours,
-  formatCents,
-} from "@/lib/format";
+import { formatCents } from "@/lib/format";
 
 export type AvatarStyle = "explorer" | "gamer" | "foodie" | "cozy";
 
-const AVATAR_STYLES: Array<{ id: AvatarStyle; label: string; tagline: string }> = [
-  { id: "explorer", label: "Budget Explorer", tagline: "Field hat & satchel" },
-  { id: "gamer", label: "Arcade Collector", tagline: "Headset & visor" },
-  { id: "foodie", label: "Costco Regular", tagline: "Chef cap & apron" },
-  { id: "cozy", label: "Mindful Minimalist", tagline: "Knit beanie & scarf" },
+const AVATAR_STYLES: Array<{ id: AvatarStyle; label: string }> = [
+  { id: "explorer", label: "Hoard Explorer" },
+  { id: "gamer", label: "Arcade Collector" },
+  { id: "foodie", label: "Costco Regular" },
+  { id: "cozy", label: "Cozy Collector" },
 ];
 
 const AVATAR_COLORS = [
@@ -70,20 +68,14 @@ export function CharacterAvatarSvg({
       fill="none"
       aria-label={`Collector avatar (${safeStyle})`}
     >
-      {/* Pedestal glow ring */}
       <ellipse cx="60" cy="108" rx="34" ry="7" fill="rgba(26,35,32,0.12)" />
-
-      {/* Torso / Jacket */}
       <path
         d="M32 104 C32 80, 44 72, 60 72 C76 72, 88 80, 88 104 Z"
         fill={color}
         stroke="#1A2320"
         strokeWidth="2.5"
       />
-      {/* Shirt collar detail */}
       <path d="M51 73 L60 85 L69 73 Z" fill="#FAF8F3" />
-
-      {/* Head */}
       <circle
         cx="60"
         cy="48"
@@ -92,8 +84,6 @@ export function CharacterAvatarSvg({
         stroke="#1A2320"
         strokeWidth="2.5"
       />
-
-      {/* Rosy cheeks & cheerful expression */}
       <circle cx="49" cy="52" r="2.8" fill="#E89A84" opacity="0.7" />
       <circle cx="71" cy="52" r="2.8" fill="#E89A84" opacity="0.7" />
       <circle cx="52" cy="46" r="2.5" fill="#1A2320" />
@@ -106,10 +96,8 @@ export function CharacterAvatarSvg({
         fill="none"
       />
 
-      {/* Style-specific accessories */}
       {safeStyle === "explorer" && (
         <g>
-          {/* Explorer brimmed hat */}
           <path
             d="M33 34 Q60 27 87 34 Q60 39 33 34 Z"
             fill="#9A7B3E"
@@ -123,21 +111,18 @@ export function CharacterAvatarSvg({
             strokeWidth="2.2"
           />
           <path d="M43 29 H77" stroke="#1B4D3E" strokeWidth="3" />
-          {/* Satchel strap */}
           <path d="M41 78 L78 103" stroke="#9A7B3E" strokeWidth="4.5" strokeLinecap="round" />
         </g>
       )}
 
       {safeStyle === "gamer" && (
         <g>
-          {/* Hair tuft */}
           <path
             d="M39 42 C40 24, 80 24, 81 42 C72 33, 48 33, 39 42 Z"
             fill="#27323F"
             stroke="#1A2320"
             strokeWidth="2"
           />
-          {/* Gaming headset band & cups */}
           <path
             d="M36 47 C36 20, 84 20, 84 47"
             stroke="#3F5563"
@@ -164,14 +149,12 @@ export function CharacterAvatarSvg({
             stroke="#1A2320"
             strokeWidth="2"
           />
-          {/* Handheld mini badge on jacket */}
           <rect x="65" y="84" width="12" height="8" rx="2" fill="#FAF8F3" stroke="#1A2320" strokeWidth="1.5" />
         </g>
       )}
 
       {safeStyle === "foodie" && (
         <g>
-          {/* Crisp chef / foodie cap */}
           <path
             d="M42 32 C35 20, 48 12, 60 15 C72 12, 85 20, 78 32 Z"
             fill="#FFFFFF"
@@ -188,14 +171,12 @@ export function CharacterAvatarSvg({
             stroke="#1A2320"
             strokeWidth="2"
           />
-          {/* Apron strings */}
           <path d="M47 75 V103 M73 75 V103" stroke="#FAF8F3" strokeWidth="3" />
         </g>
       )}
 
       {safeStyle === "cozy" && (
         <g>
-          {/* Warm knit beanie */}
           <path
             d="M39 39 C40 20, 80 20, 81 39 Z"
             fill="#C45B3E"
@@ -213,7 +194,6 @@ export function CharacterAvatarSvg({
             stroke="#1A2320"
             strokeWidth="2"
           />
-          {/* Scarf */}
           <path
             d="M42 71 Q60 80 78 71 L75 83 Q60 89 45 83 Z"
             fill="#E4DDD0"
@@ -236,7 +216,6 @@ export function Switch2ConsoleSvg({ width = 128 }: { width?: number }) {
       fill="none"
       aria-label="Nintendo Switch 2 console"
     >
-      {/* Left magnetic Joy-Con (matte charcoal with cyan inner accent) */}
       <path
         d="M24 14 H36 V86 H24 C12 86, 6 78, 6 66 V34 C6 22, 12 14, 24 14 Z"
         fill="#24292E"
@@ -250,7 +229,6 @@ export function Switch2ConsoleSvg({ width = 128 }: { width?: number }) {
       <circle cx="25" cy="61" r="2.6" fill="#525B64" />
       <circle cx="20" cy="66" r="2.6" fill="#525B64" />
 
-      {/* Right magnetic Joy-Con (matte charcoal with coral accent) */}
       <path
         d="M144 14 H156 C168 14, 174 22, 174 34 V66 C174 78, 168 86, 156 86 H144 V14 Z"
         fill="#24292E"
@@ -265,7 +243,6 @@ export function Switch2ConsoleSvg({ width = 128 }: { width?: number }) {
       <circle cx="160" cy="39" r="2.6" fill="#525B64" />
       <rect x="155" y="71" width="6" height="6" rx="1.5" fill="#E35D43" />
 
-      {/* Center 8-inch Console Tablet */}
       <rect
         x="37"
         y="12"
@@ -276,11 +253,9 @@ export function Switch2ConsoleSvg({ width = 128 }: { width?: number }) {
         stroke="#1A2320"
         strokeWidth="2.5"
       />
-      {/* Vibrant Screen Display */}
       <rect x="43" y="18" width="94" height="64" rx="3" fill="#1F3B4D" />
       <path d="M43 60 Q70 46 95 58 T137 54 V82 H43 Z" fill="#1B4D3E" />
       <circle cx="118" cy="32" r="7" fill="#F2B84B" />
-      {/* Bold "2" emblem on screen */}
       <rect x="52" y="25" width="32" height="16" rx="4" fill="rgba(255,255,255,0.16)" />
       <text
         x="68"
@@ -306,7 +281,6 @@ export function HotDogSpriteSvg({ size = 24 }: { size?: number }) {
       fill="none"
       aria-hidden="true"
     >
-      {/* Back bun */}
       <rect
         x="3"
         y="6"
@@ -317,7 +291,6 @@ export function HotDogSpriteSvg({ size = 24 }: { size?: number }) {
         stroke="#6B421B"
         strokeWidth="1.5"
       />
-      {/* Frankfurter sausage */}
       <rect
         x="1"
         y="8"
@@ -328,14 +301,12 @@ export function HotDogSpriteSvg({ size = 24 }: { size?: number }) {
         stroke="#632616"
         strokeWidth="1.4"
       />
-      {/* Front bun highlight */}
       <path
         d="M5 14.5 C12 17, 24 17, 31 14.5"
         stroke="#F4D092"
         strokeWidth="2.2"
         strokeLinecap="round"
       />
-      {/* Mustard squiggle */}
       <path
         d="M5 11.5 Q9 9 13 11.5 T21 11.5 T29 11.5"
         stroke="#F7C948"
@@ -357,6 +328,8 @@ export function SmallHoardIconSvg({
   switch (type) {
     case "costco_hotdog":
       return <HotDogSpriteSvg size={size} />;
+    case "switch_2":
+      return <Switch2ConsoleSvg width={Math.max(36, Math.round(size * 1.4))} />;
     case "coffee":
       return (
         <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
@@ -434,48 +407,33 @@ export function SmallHoardIconSvg({
   }
 }
 
-export function SavingsChestSvg({ size = 80 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 88 88" fill="none" aria-label="Savings Treasure Vault">
-      <ellipse cx="44" cy="77" rx="32" ry="6" fill="rgba(26,35,32,0.12)" />
-      {/* Gold coin pile behind open lid */}
-      <circle cx="32" cy="36" r="7" fill="#E8B948" stroke="#8A6114" strokeWidth="1.8" />
-      <circle cx="44" cy="33" r="8" fill="#F4C95D" stroke="#8A6114" strokeWidth="1.8" />
-      <circle cx="56" cy="37" r="7" fill="#E8B948" stroke="#8A6114" strokeWidth="1.8" />
-      {/* Open Chest Lid */}
-      <path
-        d="M16 32 C16 17, 72 17, 72 32 Z"
-        fill="#1B4D3E"
-        stroke="#1A2320"
-        strokeWidth="2.2"
-      />
-      {/* Chest Base */}
-      <rect
-        x="16"
-        y="38"
-        width="56"
-        height="34"
-        rx="5"
-        fill="#246350"
-        stroke="#1A2320"
-        strokeWidth="2.2"
-      />
-      {/* Brass Bands & Lock */}
-      <rect x="25" y="38" width="6" height="34" fill="#E8B948" stroke="#1A2320" strokeWidth="1.5" />
-      <rect x="57" y="38" width="6" height="34" fill="#E8B948" stroke="#1A2320" strokeWidth="1.5" />
-      <rect x="39" y="34" width="10" height="12" rx="2.5" fill="#F4C95D" stroke="#1A2320" strokeWidth="1.8" />
-      <circle cx="44" cy="40" r="2" fill="#1A2320" />
-    </svg>
-  );
+interface HoardBadge {
+  id: string;
+  label: string;
+  unlocked: boolean;
+}
+
+function computeHoardBadges(clusters: HoardCluster[]): HoardBadge[] {
+  const byType = new Map(clusters.map((c) => [c.type, c]));
+  const hotdogs = byType.get("costco_hotdog")?.totalQuantity ?? 0;
+  const switch2 = byType.get("switch_2")?.totalQuantity ?? 0;
+  const steamCents = byType.get("steam_game")?.totalSpentCents ?? 0;
+  const coffees = byType.get("coffee")?.totalQuantity ?? 0;
+
+  return [
+    { id: "glizzy", label: "Costco Glizzy Legend (100+)", unlocked: hotdogs >= 100 },
+    { id: "switch2", label: "Next-Gen Owner (Switch 2)", unlocked: switch2 >= 1 },
+    { id: "steam", label: "Steam Shelf ($250+)", unlocked: steamCents >= 25000 },
+    { id: "coffee", label: "Caffeine Crew (3+)", unlocked: coffees >= 3 },
+    { id: "variety", label: "Hoard Collector (5+ Piles)", unlocked: clusters.length >= 5 },
+  ];
 }
 
 interface HoardVisualProps {
   userName: string | null;
   avatarStyle: string;
   avatarColor: string;
-  hourlyNetPayCents: number;
   monthKey: string;
-  totalSavedCents: number;
   transactions: HoardTransactionInput[];
   onRefresh: () => Promise<void>;
 }
@@ -484,9 +442,7 @@ export function HoardVisual({
   userName,
   avatarStyle,
   avatarColor,
-  hourlyNetPayCents,
   monthKey,
-  totalSavedCents,
   transactions,
   onRefresh,
 }: HoardVisualProps) {
@@ -522,6 +478,9 @@ export function HoardVisual({
 
   const totalItemsCount = clusters.reduce((s, c) => s + c.totalQuantity, 0);
   const totalSpentCents = clusters.reduce((s, c) => s + c.totalSpentCents, 0);
+  const badges = useMemo(() => computeHoardBadges(clusters), [clusters]);
+  const unlockedCount = badges.filter((b) => b.unlocked).length;
+  const collectorLevel = Math.max(1, 1 + Math.floor(totalItemsCount / 25) + unlockedCount);
 
   async function saveAvatarSettings(newStyle: string, newColor: string) {
     setSavingAvatar(true);
@@ -574,6 +533,20 @@ export function HoardVisual({
     }
   }
 
+  async function removeTxFromHoard(txId: string) {
+    setSavingTx(true);
+    try {
+      const res = await fetch(`/api/transactions/${txId}/reflection`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        await onRefresh();
+      }
+    } finally {
+      setSavingTx(false);
+    }
+  }
+
   const hotdogCluster = clusters.find((c) => c.type === "costco_hotdog");
   const switchCluster = clusters.find((c) => c.type === "switch_2");
   const steamCluster = clusters.find((c) => c.type === "steam_game");
@@ -590,15 +563,15 @@ export function HoardVisual({
       <div className="hoard-header">
         <div>
           <div className="hoard-kicker">
-            <Sparkles size={14} /> Where Every Dollar Actually Went
+            <Sparkles size={14} /> Interactive Purchase Hoard
           </div>
-          <h2 className="hoard-title">
-            {userName ? `${userName.split(" ")[0]}’s` : "Your"} Spend &amp; Savings Hoard
-          </h2>
+          <h1 className="hoard-title">
+            {userName ? `${userName.split(" ")[0]}’s` : "Your"} Loot Pile
+          </h1>
           <p className="hoard-sub">
-            Instead of dry spreadsheets, every swipe stacks the literal things
-            you bought right beneath your avatar. Click any pile to inspect or
-            re-tag it.
+            Every purchase drops the actual stuff you bought right below your
+            avatar. Drop more items below or click any pile to inspect and
+            customize it.
           </p>
         </div>
 
@@ -726,8 +699,8 @@ export function HoardVisual({
         </div>
       )}
 
-      {/* Avatar Pedestal + Savings Chest Twin Anchor */}
-      <div className="hoard-pedestal-row">
+      {/* Avatar Pedestal + Hoard Badges Showcase */}
+      <div className="hoard-pedestal-row hoard-pedestal-gameplay">
         <div className="hoard-avatar-card">
           <div className="hoard-avatar-wrap">
             <CharacterAvatarSvg
@@ -737,34 +710,31 @@ export function HoardVisual({
             />
           </div>
           <div className="hoard-pedestal-base">
+            <span className="hoard-level-pill mono-num">
+              <Trophy size={13} /> Level {collectorLevel} Collector
+            </span>
             <span className="hoard-pedestal-name">
-              {userName || "Mindful Spender"}
+              {userName || "Hoard Collector"}
             </span>
             <span className="hoard-pedestal-stats mono-num">
-              {totalItemsCount.toLocaleString()} items · {formatCents(totalSpentCents)} spent
+              {totalItemsCount.toLocaleString()} items piled · {formatCents(totalSpentCents)} total
             </span>
           </div>
         </div>
 
-        <div className="hoard-vs-divider" aria-hidden="true">
-          <span>vs.</span>
-        </div>
-
-        <div className="hoard-treasure-card">
-          <SavingsChestSvg size={86} />
-          <div>
-            <div className="hoard-treasure-label">
-              <Coins size={14} /> Kept Savings Treasure
-            </div>
-            <div className="hoard-treasure-value mono-num">
-              {formatCents(totalSavedCents)}
-            </div>
-            <div className="hoard-treasure-hint">
-              10-yr invested value:{" "}
-              <strong className="mono-num">
-                {formatCents(calcTenYearOpportunityCents(totalSavedCents))}
-              </strong>
-            </div>
+        <div className="hoard-badges-card">
+          <div className="hoard-treasure-label">
+            <Award size={14} /> Unlocked Hoard Badges ({unlockedCount}/{badges.length})
+          </div>
+          <div className="hoard-badge-grid">
+            {badges.map((b) => (
+              <span
+                key={b.id}
+                className={`hoard-badge-chip ${b.unlocked ? "unlocked" : "locked"}`}
+              >
+                {b.label}
+              </span>
+            ))}
           </div>
         </div>
       </div>
@@ -772,9 +742,9 @@ export function HoardVisual({
       {/* Main Visual Hoard Arena */}
       {clusters.length === 0 ? (
         <div className="surface-oat" style={{ textAlign: "center", padding: 32 }}>
-          No purchases in this timeframe yet. Use the{" "}
-          <strong>Simulate Live Card Swipe</strong> tool below to add hot dogs,
-          a Switch 2, Steam games, or coffee to your hoard!
+          Your hoard pile is empty for this timeframe! Use the{" "}
+          <strong>Drop Items Into Your Hoard</strong> panel below to toss hot
+          dogs, a Switch 2, or Steam games into your pile.
         </div>
       ) : (
         <div className="hoard-arena-grid">
@@ -791,7 +761,7 @@ export function HoardVisual({
                     {hotdogCluster.totalQuantity}× {hotdogCluster.pluralLabel}
                   </span>
                   <div className="hoard-zone-sub">
-                    Every hot dog you bought rendered below your avatar
+                    Every hot dog you bought piled beneath your avatar
                   </div>
                 </div>
                 <span className="hoard-price-tag mono-num">
@@ -800,7 +770,10 @@ export function HoardVisual({
               </div>
 
               {viewMode === "pile" ? (
-                <div className="hotdog-pile-canvas" aria-label={`${hotdogCluster.totalQuantity} hot dogs`}>
+                <div
+                  className="hotdog-pile-canvas"
+                  aria-label={`${hotdogCluster.totalQuantity} hot dogs`}
+                >
                   {Array.from({
                     length: Math.min(200, hotdogCluster.totalQuantity),
                   }).map((_, idx) => {
@@ -850,7 +823,7 @@ export function HoardVisual({
                       ? switchCluster.label
                       : switchCluster.pluralLabel}
                   </span>
-                  <div className="hoard-zone-sub">Flagship Console Purchase</div>
+                  <div className="hoard-zone-sub">Flagship Console Drop</div>
                 </div>
                 <span className="hoard-price-tag mono-num">
                   {formatCents(switchCluster.totalSpentCents)}
@@ -882,12 +855,7 @@ export function HoardVisual({
                     {steamCluster.totalQuantity}× Steam Game Artwork
                   </span>
                   <div className="hoard-zone-sub">
-                    Digital library shelf ·{" "}
-                    {calcWorkHours(
-                      steamCluster.totalSpentCents,
-                      hourlyNetPayCents
-                    )}{" "}
-                    of work
+                    Digital game cases stacked in your shelf
                   </div>
                 </div>
                 <span className="hoard-price-tag mono-num">
@@ -925,7 +893,7 @@ export function HoardVisual({
             </button>
           )}
 
-          {/* 4. Remaining Everyday Hoard Piles (Coffee, Groceries, Takeout, Apparel, etc.) */}
+          {/* 4. Remaining Everyday Hoard Piles */}
           {otherClusters.map((cluster) => {
             const visibleLimit = viewMode === "pile" ? 36 : 1;
             const visibleCount = Math.min(visibleLimit, cluster.totalQuantity);
@@ -979,7 +947,7 @@ export function HoardVisual({
         </div>
       )}
 
-      {/* Interactive Cluster Inspector & Re-tagger Modal */}
+      {/* Interactive Pile Inspector & Re-tagger Modal */}
       {selectedCluster && (
         <div
           className="modal-backdrop"
@@ -1010,22 +978,12 @@ export function HoardVisual({
                     : selectedCluster.pluralLabel}
                 </h3>
                 <p style={{ fontSize: "0.86rem", color: "var(--ink-secondary)", marginTop: 4 }}>
-                  Total spent:{" "}
+                  Pile total:{" "}
                   <strong className="mono-num">
                     {formatCents(selectedCluster.totalSpentCents)}
                   </strong>{" "}
-                  ·{" "}
-                  {calcWorkHours(
-                    selectedCluster.totalSpentCents,
-                    hourlyNetPayCents
-                  )}{" "}
-                  of work ·{" "}
-                  <strong className="mono-num">
-                    {formatCents(
-                      calcTenYearOpportunityCents(selectedCluster.totalSpentCents)
-                    )}
-                  </strong>{" "}
-                  10-yr invested value
+                  across {selectedCluster.transactions.length} purchase
+                  {selectedCluster.transactions.length === 1 ? "" : "s"}
                 </p>
               </div>
               <button
@@ -1053,22 +1011,32 @@ export function HoardVisual({
                           day: "numeric",
                           year: "numeric",
                         })}{" "}
-                        · {tx.hoardQuantity || 1}× {tx.hoardItemLabel || selectedCluster.label}
-                        {tx.envelope ? ` · ${tx.envelope.name}` : ""}
+                        · {tx.hoardQuantity || 1}×{" "}
+                        {tx.hoardItemLabel || selectedCluster.label}
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <div className="mono-num" style={{ fontWeight: 700 }}>
                         {formatCents(tx.amountCents)}
                       </div>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        style={{ marginTop: 4 }}
-                        onClick={() => startEditTx(tx)}
-                      >
-                        <Edit3 size={13} /> Edit Hoard Item
-                      </button>
+                      <div style={{ display: "flex", gap: 4, justifyContent: "flex-end", marginTop: 4 }}>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => startEditTx(tx)}
+                        >
+                          <Edit3 size={13} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={savingTx}
+                          onClick={() => removeTxFromHoard(tx.id)}
+                          title="Remove from hoard"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
                     </div>
                   </div>
 

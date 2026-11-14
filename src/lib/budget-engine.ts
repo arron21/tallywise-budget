@@ -1,6 +1,5 @@
 import { prisma } from "./prisma";
 import { getCurrentMonthKey } from "./format";
-import { buildPurchaseCoaching } from "./research";
 import { dispatchBudgetNotification } from "./push";
 import { inferHoardItem } from "./hoard-engine";
 
@@ -260,19 +259,10 @@ export async function applyPurchaseAndNotify(params: {
   const monthKey = getCurrentMonthKey(params.date);
   await ensureBudgetMonthForUser(params.userId, monthKey);
 
-  const [user, envelopes, savingsGoals] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: params.userId },
-      select: { hourlyNetPayCents: true },
-    }),
-    prisma.budgetEnvelope.findMany({
-      where: { userId: params.userId, monthKey },
-      orderBy: { sortOrder: "asc" },
-    }),
-    prisma.savingsGoal.findMany({
-      where: { userId: params.userId },
-    }),
-  ]);
+  const envelopes = await prisma.budgetEnvelope.findMany({
+    where: { userId: params.userId, monthKey },
+    orderBy: { sortOrder: "asc" },
+  });
 
   const matchedEnvelope =
     (params.explicitEnvelopeId
@@ -286,31 +276,6 @@ export async function applyPurchaseAndNotify(params: {
     );
 
   const isPurchase = params.amountCents > 0;
-  const savingsMonthlyTargetCents = savingsGoals.reduce(
-    (sum, g) => sum + g.monthlyTargetCents,
-    0
-  );
-
-  let coaching = {
-    status: "WITHIN_BUDGET" as "WITHIN_BUDGET" | "NEAR_LIMIT" | "OVER_BUDGET",
-    title: `Card Credit/Payment: ${params.merchantName}`,
-    body: "Credit or refund applied to your card balance.",
-    coachingNote: "Refund or card payment recorded.",
-  };
-
-  if (isPurchase && matchedEnvelope) {
-    const newSpentCents = matchedEnvelope.spentCents + params.amountCents;
-    coaching = buildPurchaseCoaching({
-      merchantName: params.merchantName,
-      amountCents: params.amountCents,
-      envelopeName: matchedEnvelope.name,
-      allocatedCents: matchedEnvelope.allocatedCents,
-      newSpentCents,
-      hourlyNetPayCents: user?.hourlyNetPayCents ?? 3200,
-      paymentChannel: params.paymentChannel || "in store",
-      savingsMonthlyTargetCents,
-    });
-  }
 
   const hoardInfo = isPurchase
     ? inferHoardItem({
@@ -323,6 +288,26 @@ export async function applyPurchaseAndNotify(params: {
         explicitQuantity: params.hoardQuantity,
       })
     : { hoardItemType: null, hoardItemLabel: null, hoardQuantity: null };
+
+  const dollars = (params.amountCents / 100).toFixed(2);
+  const qtyText =
+    hoardInfo.hoardQuantity && hoardInfo.hoardQuantity > 1
+      ? `${hoardInfo.hoardQuantity}× ${hoardInfo.hoardItemLabel}`
+      : hoardInfo.hoardItemLabel || params.merchantName;
+
+  const coaching = isPurchase
+    ? {
+        status: "WITHIN_BUDGET" as const,
+        title: `Hoard Drop: +${qtyText} ($${dollars})`,
+        body: `From ${params.merchantName} — added straight into your visual pile!`,
+        coachingNote: `Added ${qtyText} ($${dollars}) to your hoard.`,
+      }
+    : {
+        status: "WITHIN_BUDGET" as const,
+        title: `Card Credit: ${params.merchantName}`,
+        body: "Credit or refund applied.",
+        coachingNote: "Refund recorded.",
+      };
 
   const tx = await prisma.transaction.create({
     data: {

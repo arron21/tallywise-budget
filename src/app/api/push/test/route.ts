@@ -10,8 +10,8 @@ export async function POST() {
 
   const result = await dispatchBudgetNotification({
     userId: session.user.id,
-    title: "Tallywise Alerts Active",
-    body: "You'll get instant budget feedback every time a credit card purchase syncs.",
+    title: "Tallywise Hoard Alerts Active",
+    body: "You'll get instant drop alerts every time a synced purchase lands in your Purchase Hoard.",
     severity: "WITHIN_BUDGET",
     url: "/dashboard",
   });

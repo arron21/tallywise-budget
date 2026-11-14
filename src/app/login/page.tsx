@@ -42,7 +42,7 @@ function LoginForm() {
       <div className="auth-card">
         <h1 style={{ fontSize: "1.8rem" }}>Welcome back</h1>
         <p style={{ color: "var(--ink-secondary)", fontSize: "0.92rem", marginTop: 6 }}>
-          Sign in to check your envelopes, Card Payment Reserve, and purchase alerts.
+          Sign in to visit your avatar, inspect your loot pile, and drop new purchases.
         </p>
 
         <button
@@ -53,7 +53,7 @@ function LoginForm() {
           onClick={() => submitCredentials("demo@tallywise.app", "demo1234")}
         >
           <Sparkles size={16} />
-          1-Click Live Demo (Maya Lin)
+          1-Click Live Demo (Maya Lin&apos;s Hoard)
         </button>
 
         <div
@@ -118,7 +118,7 @@ function LoginForm() {
         <p style={{ fontSize: "0.86rem", color: "var(--ink-secondary)", marginTop: 18, textAlign: "center" }}>
           New to Tallywise?{" "}
           <Link href="/register" style={{ color: "var(--emerald)", fontWeight: 600 }}>
-            Create your free budget
+            Start your free Purchase Hoard
           </Link>
         </p>
       </div>

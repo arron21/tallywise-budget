@@ -1,15 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { CreditCard, ShieldCheck, Webhook } from "lucide-react";
+import { CreditCard, Sparkles, Webhook } from "lucide-react";
 import { PlaidLinkButton } from "@/components/PlaidLinkButton";
 import { PushManager } from "@/components/PushManager";
 import { formatCents } from "@/lib/format";
 
 interface CardsPayload {
-  budgetMonth: {
-    cardReserveCents: number;
-  };
   cards: Array<{
     id: string;
     name: string;
@@ -62,16 +59,15 @@ export function CardsClient() {
     );
   }
 
-  const totalBalance = data.cards.reduce((s, c) => s + c.currentBalanceCents, 0);
-  const annualInterestSavedCents = Math.round(totalBalance * 0.2199);
+  const totalSyncedCents = data.cards.reduce((s, c) => s + c.currentBalanceCents, 0);
 
   return (
     <div className="container page-shell">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Connected Credit Cards &amp; Push Alerts</h1>
+          <h1 className="page-title">Connected Cards &amp; Hoard Drop Alerts</h1>
           <p className="page-subtitle">
-            Connect live cards via Plaid Transactions Sync and configure instant browser or mobile PWA notifications.
+            Connect live cards via Plaid Transactions Sync so every swipe drops right into your Purchase Hoard and triggers instant alerts.
           </p>
         </div>
       </div>
@@ -101,20 +97,19 @@ export function CardsClient() {
       <section className="surface-card" style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
           <div>
-            <h2 style={{ fontSize: "1.3rem" }}>Tracked Credit Card Accounts</h2>
+            <h2 style={{ fontSize: "1.3rem" }}>Synced Card Sources</h2>
             <p style={{ fontSize: "0.88rem", color: "var(--ink-secondary)" }}>
-              Card Payment Reserve: <strong className="mono-num">{formatCents(data.budgetMonth.cardReserveCents)}</strong>{" "}
-              vs. Total Balance: <strong className="mono-num">{formatCents(totalBalance)}</strong>
+              Total tracked card activity feeding your hoard: <strong className="mono-num">{formatCents(totalSyncedCents)}</strong>
             </p>
           </div>
           <span className="status-pill status-within">
-            <ShieldCheck size={14} /> Avoiding ~{formatCents(annualInterestSavedCents)}/yr in APR
+            <Sparkles size={14} /> Auto-tagging enabled
           </span>
         </div>
 
         {data.cards.length === 0 ? (
           <div className="surface-oat">
-            No cards linked yet. Connect via Plaid above or trigger a simulated swipe on the Budget page to initialize a demo card.
+            No cards linked yet. Connect via Plaid above or trigger a loot drop on the My Hoard page to initialize a demo card.
           </div>
         ) : (
           <div
@@ -141,8 +136,7 @@ export function CardsClient() {
                     </span>
                   </div>
                   <div style={{ fontSize: "0.8rem", color: "var(--ink-muted)", marginTop: 4 }}>
-                    {card.mask ? `Ending in ••${card.mask}` : "Card Account"} ·{" "}
-                    {(card.aprBps / 100).toFixed(2)}% APR
+                    {card.mask ? `Ending in ••${card.mask}` : "Card Account"}
                   </div>
                   <div className="mono-num" style={{ fontSize: "1.35rem", fontWeight: 700, marginTop: 10 }}>
                     {formatCents(card.currentBalanceCents)}
@@ -156,7 +150,7 @@ export function CardsClient() {
                         />
                       </div>
                       <div style={{ fontSize: "0.78rem", color: "var(--ink-secondary)" }}>
-                        {util}% utilization of {formatCents(card.creditLimitCents)} limit
+                        {util}% of {formatCents(card.creditLimitCents)} card limit
                       </div>
                     </>
                   )}

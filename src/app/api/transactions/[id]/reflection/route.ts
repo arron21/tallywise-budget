@@ -77,3 +77,42 @@ export async function POST(
 
   return NextResponse.json({ ok: true, transaction: updated });
 }
+
+export async function DELETE(
+  _req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await context.params;
+  const userId = session.user.id;
+
+  const existing = await prisma.transaction.findFirst({
+    where: { id, userId },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: "Transaction not found." }, { status: 404 });
+  }
+
+  await prisma.notificationEvent.deleteMany({
+    where: { transactionId: existing.id, userId },
+  });
+
+  await prisma.transaction.delete({
+    where: { id: existing.id },
+  });
+
+  if (existing.amountCents > 0) {
+    await prisma.creditCardAccount.update({
+      where: { id: existing.creditCardAccountId },
+      data: { currentBalanceCents: { decrement: existing.amountCents } },
+    });
+  }
+
+  await recalculateMonthTotals(userId, getCurrentMonthKey(existing.date));
+
+  return NextResponse.json({ ok: true });
+}

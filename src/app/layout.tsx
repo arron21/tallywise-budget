@@ -23,9 +23,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tallywise — Mindful Credit Card Budgeting & Real Savings",
+  title: "Tallywise — Your Interactive Visual Purchase Hoard",
   description:
-    "Counter credit card overspending with zero-based envelopes, automatic Card Payment Reserves, real-time Plaid sync, and instant Web Push budget alerts.",
+    "Turn every card swipe into a playful visual pile under your avatar — 150 Costco hot dogs, a Nintendo Switch 2, Steam game art, badges, and instant drop alerts.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icons/icon-192.png",

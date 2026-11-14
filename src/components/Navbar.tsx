@@ -6,9 +6,8 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   Bell,
-  BookOpen,
   CreditCard,
-  LayoutDashboard,
+  Sparkles,
   LogOut,
   CheckCheck,
 } from "lucide-react";
@@ -62,8 +61,7 @@ export function Navbar({
   }
 
   const navItems = [
-    { href: "/dashboard", label: "Budget", icon: LayoutDashboard },
-    { href: "/academy", label: "Spending Science", icon: BookOpen },
+    { href: "/dashboard", label: "My Hoard", icon: Sparkles },
     { href: "/cards", label: "Cards & Alerts", icon: CreditCard },
   ];
 
@@ -100,20 +98,12 @@ export function Navbar({
                 );
               })
             ) : (
-              <>
-                <Link
-                  href="/academy"
-                  className={`nav-link ${pathname === "/academy" ? "active" : ""}`}
-                >
-                  Spending Science
-                </Link>
-                <Link
-                  href="/login"
-                  className={`nav-link ${pathname === "/login" ? "active" : ""}`}
-                >
-                  Sign In
-                </Link>
-              </>
+              <Link
+                href="/login"
+                className={`nav-link ${pathname === "/login" ? "active" : ""}`}
+              >
+                Sign In
+              </Link>
             )}
           </nav>
 
@@ -155,7 +145,7 @@ export function Navbar({
                       }}
                     >
                       <strong style={{ fontSize: "0.92rem" }}>
-                        Purchase Alerts
+                        Hoard Drop Alerts
                       </strong>
                       {unreadCount > 0 && (
                         <button
@@ -169,7 +159,7 @@ export function Navbar({
                     </div>
                     {notifications.length === 0 ? (
                       <p style={{ fontSize: "0.85rem", color: "var(--ink-muted)" }}>
-                        No purchase alerts yet. Simulate a swipe or sync Plaid to see real-time coaching.
+                        No loot drops yet. Drop an item into your pile or sync a card via Plaid to see alerts here.
                       </p>
                     ) : (
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -204,7 +194,7 @@ export function Navbar({
               </>
             ) : (
               <Link href="/register" className="btn btn-primary btn-sm">
-                Start Budgeting
+                Start Your Hoard
               </Link>
             )}
           </div>

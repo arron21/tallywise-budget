@@ -52,9 +52,9 @@ export default function RegisterPage() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
-        <h1 style={{ fontSize: "1.8rem" }}>Create your real budget</h1>
+        <h1 style={{ fontSize: "1.8rem" }}>Start your Purchase Hoard</h1>
         <p style={{ color: "var(--ink-secondary)", fontSize: "0.92rem", marginTop: 6 }}>
-          Set up zero-based envelopes, Pay Yourself First savings, and instant card alerts.
+          Pick your avatar, sync cards or drop purchases, and pile up everything you buy.
         </p>
 
         <form
@@ -110,7 +110,7 @@ export default function RegisterPage() {
           {error && <div className="banner-error">{error}</div>}
 
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Creating account..." : "Start My Budget"}
+            {loading ? "Creating hoard..." : "Create My Hoard"}
           </button>
         </form>
 
